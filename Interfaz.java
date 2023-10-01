@@ -1,43 +1,69 @@
-
-
+// Se importan las librerias necesarias
 import java.util.Scanner;
 
+/**
+ * Clase que gestiona la interacción con el usuario para el juego.
+ * Contiene métodos para iniciar el juego, obtener entrada del usuario y mostrar el tablero.
+ * Utiliza la clase Juego para gestionar la lógica del juego.
+ *
+ * @author JJ
+ * @version 1.0
+ */
 public class Interfaz {
+
     private static Scanner entrada = new Scanner(System.in);
     private static Juego partida;
-    private static int minWin = 4;
+    private static int minWin = 4; //valor minimo para ganar por defecto
 
+    /**
+     * Constructor de la clase Interfaz.
+     */
     public Interfaz(){
-
+        // Constructor vacío
     }
-
+    /**
+     * Inicia el juego, solicita la configuración y gestiona juego.
+     */
     public void iniciarJuego(){
+        // Inicia el juego
         iniciarTablero();
         boolean terminarPartida = false;
         while(true){
+            //Ciclo de juego
             for(int i = 0;i<partida.getJugadores().length;i++){
+                //Ciclo de jugadores
                 mostrarTablero(partida.getTablero());
+                //Ciclo de jugadas
                 partida.setTablero(nuevoTablero(elegirJugada(partida.getTablero(),i),i,partida.getTablero()));
+                //Verificar si el jugador actual gana
                 if(!partidaSigue(partida.getTablero(),i)){
                     mostrarTablero(partida.getTablero());
                     terminarPartida = true;   
                     break;
                 }
             }
+            //Verificar si el juego termina
             if(terminarPartida) break;
             
         }
+        //Cierre el scanner
         entrada.close();
     }
-
+    /*
+     * Inicia el tablero del juego.
+     * Solicita la configuración del juego al usuario.
+     * Crea una instancia de la clase Juego con la configuración del usuario.
+     */
     private static void iniciarTablero(){
-            int cantidadJugadores;
-            int tamañoMinTableroValido;
-            int tamañoFilas;
-            int tamañoColumnas;
-            Jugador[] jugadores;
+        int cantidadJugadores;
+        int tamañoMinTableroValido;
+        int tamañoFilas;
+        int tamañoColumnas;
+        Jugador[] jugadores;
+        //Se valida tipo de juego personalizado o clasico
         boolean personalizado = obtenervalor("Digite modo 1.Personalizado 2.Clasico: ", new int[]{1, 2}) == 1;
         if (personalizado){
+            //Se solicita configuracion de juego personalizado
             cantidadJugadores = obtenervalor("Digite cantidad de jugadores (debe ser mayor o igual a 1 ): ",1);
             jugadores = obtenerJugadores(cantidadJugadores);
             minWin = obtenervalor(("Digite valor para ganar (recomendado 4): "), 1);
@@ -46,17 +72,25 @@ public class Interfaz {
             tamañoColumnas = obtenervalor("Digite tamaño de columna (debe ser mayor o igual a "+tamañoMinTableroValido+"): ",tamañoMinTableroValido);
  
         }else{
+            //Se establece configuracion de juego clasico
             cantidadJugadores = 2;
             minWin = 4;
             tamañoMinTableroValido = minWin;
             tamañoFilas = 6;
-            tamañoColumnas = 6;
+            tamañoColumnas = 7;
             jugadores = obtenerJugadores(cantidadJugadores);
         }
-       char [][] tablero = crearTablero(tamañoFilas,tamañoColumnas);
+        //Se crea tablero
+        char [][] tablero = crearTablero(tamañoFilas,tamañoColumnas);
+        //Se crea instancia de juego
         partida = new Juego(tablero,jugadores);
     }
-
+    /**
+     * Crea un tablero vacío con el tamaño especificado.
+     * @param filas Filas del tablero.
+     * @param columnas columnas del tablero.
+     * @return El tablero con caracteres en blanco.
+     */
     private static char [][] crearTablero(int filas, int columnas){
         char [][] tablero = new char [filas][columnas];
         for(int i = 0; i < tablero.length;i++){
@@ -66,7 +100,12 @@ public class Interfaz {
         }
         return tablero;
     }
-
+    /**
+     * Obtiene un valor entero válido y mayor o igual a un minimo.
+     * @param consulta  Consulta para el usuario.
+     * @param valormin  Valor minimo aceptado.
+     * @return El valor entero ingresado por el usuario.
+         */
     private static int obtenervalor(String consulta,int valormin){
         int valor = 0;
         while(true){
@@ -80,11 +119,13 @@ public class Interfaz {
             entrada.next();
             }
         }
-
-
         return valor;
     }
-
+    /**
+     * Crea los jugadores para la partida y devuelve la lista de los mismos.
+     * @param cantidadJugadores Cantidad de jugadores para la partida.
+     * @return  La lista de jugadores para la partida.
+     */
     private static Jugador[] obtenerJugadores(int cantidadJugadores){
         Jugador[] jugadores = new Jugador[cantidadJugadores];
 
@@ -108,7 +149,11 @@ public class Interfaz {
         }
         return jugadores;
     }
-
+    /**
+     * Obtiene un string válido.
+     * @param consulta Consulta para el usuario.
+     * @return El string ingresado por el usuario.
+     */
     private static String obtenerString(String consulta){
         String palabra;
         while(true){
@@ -118,7 +163,11 @@ public class Interfaz {
         }
         return palabra;
     }
-
+    /**
+     * Obtiene un char válido.
+     * @param consulta Consulta para el usuario.
+     * @return El char ingresado por el usuario.
+     */
     private static char obtenerChar(String consulta){
         String palabra;
         while(true){
@@ -132,27 +181,38 @@ public class Interfaz {
         }
         return palabra.charAt(0);
     }
-
+    /**
+     * Valida nombre de jugador que no exista ya en la partida.
+     * @param jugadores Lista de jugadores de la partida.
+     * @param nombreJugador Nombre del jugador a validar.
+     * @return  True si el nombre es válido, false en caso contrario.
+     */
     private static boolean validarNombre(Jugador[] jugadores,String nombreJugador){
         for(int i = 0; i<jugadores.length;i++){
             if(jugadores[i]!=null&&jugadores[i].getNombre()==nombreJugador) return false;
         }
         return true;
     }
-
+    /**
+     * Valida ficha de jugador que no exista ya en la partida.
+     * @param jugadores Lista de jugadores de la partida.
+     * @param fichaJugador Ficha del jugador a validar.
+     * @return True si la ficha es válida, false en caso contrario.
+     */
     private static boolean validarFicha(Jugador[] jugadores,char fichaJugador){
         for(int i = 0; i<jugadores.length;i++){
             if(jugadores[i]!=null&&jugadores[i].getFicha()==fichaJugador) return false;
         }
         return true;
     }
-
+    /**
+     * Imprime el tablero actual del juego.
+     * @param tableroActual Tablero actual del juego.
+     */
     private static void mostrarTablero(char [][] tableroActual){
         String separadorValores = "|";
         String separadorFilas =  "-";
         int largoEspacio = separadorValores.length()*2+1;//uno ya que char es de un solo valor
-
-
         System.out.println();//pasamos a siguiente linea al terminar la fila
         for(int i =0;i<tableroActual[0].length;i++){
             System.out.print(" "+(i+1)+"   ");
@@ -180,13 +240,23 @@ public class Interfaz {
             System.out.println();//pasamos a siguiente linea al terminar la fila
         }
     }
-    
+    /**
+     * Solicita al usuario la jugada que desea realizar.
+     * @param tableroActual Tablero actual del juego.
+     * @param indiceJugadorActual Indice del jugador actual en la lista de jugadores.
+     * @return La columna elegida por el usuario.
+     */
     private static int elegirJugada(char[][] tableroActual,int indiceJugadorActual) {
         int[] columnasPosibles = obtenerColumnasValidas(tableroActual);
         int columnaElegida = obtenervalor(partida.getJugadores()[indiceJugadorActual].getNombre() +" tu ficha es: "+ partida.getJugadores()[indiceJugadorActual].getFicha() + " elige una columna valida: ", columnasPosibles);
         return columnaElegida;
     }
-
+    /**
+     * Obtiene un valor entero válido de una lista de valores posibles
+     * @param consulta Consulta para el usuario.
+     * @param valoresPosibles Lista de valores posibles.
+     * @return El valor entero ingresado por el usuario.
+     */
     private static int obtenervalor(String consulta,int [] valoresPosibles){
         int valor = 0;
         boolean valorValido = false;
@@ -209,7 +279,11 @@ public class Interfaz {
         }
         return valor;
     }
-
+    /**
+     * Obtiene las columnas válidas para realizar una jugada.
+     * @param tableroActual Tablero actual del juego.
+     * @return La lista de columnas válidas para realizar una jugada.
+     */
     private static int [] obtenerColumnasValidas(char[][] tableroActual){
         int[] columnasPosibles = new int[tableroActual[0].length];
         int n = 0;
@@ -235,7 +309,13 @@ public class Interfaz {
         }
         return columnasValidas;
     }
- 
+    /**
+     * Crea un nuevo tablero con la jugada realizada por el jugador actual.
+     * @param columnasElegida Columna elegida por el jugador actual.
+     * @param indiceJugadorActual Indice del jugador actual en la lista de jugadores.
+     * @param tableroActual  Tablero actual del juego.
+     * @return El tablero actualizado con la jugada realizada por el jugador actual.
+     */
     private static char[][] nuevoTablero(int columnasElegida,int indiceJugadorActual,char [][] tableroActual){
 
 
@@ -248,7 +328,12 @@ public class Interfaz {
 
         return tableroActual;
     }
-
+    /**
+     * Verifica si el juego sigue.
+     * @param tableroActual Tablero actual del juego.
+     * @param indiceJugadorActual Indice del jugador actual en la lista de jugadores.
+     * @return True si el juego sigue, false en caso contrario.
+     */
     private static boolean partidaSigue(char[][] tableroActual,int indiceJugadorActual){
         if(ganaJugador(tableroActual,indiceJugadorActual)){
             System.out.println("Felicidades "+ partida.getJugadores()[indiceJugadorActual].getNombre()+" has ganado");
@@ -259,7 +344,12 @@ public class Interfaz {
         }
     return true;
     }
-
+    /**
+     * Verifica si el jugador actual gana.
+     * @param tableroActual Tablero actual del juego.
+     * @param indiceJugadorActual Indice del jugador actual en la lista de jugadores.
+     * @return True si el jugador actual gana, false en caso contrario.
+     */
     private static boolean ganaJugador(char[][] tableroActual, int indiceJugadorActual) {
         char fichaActual = partida.getJugadores()[indiceJugadorActual].getFicha();
     
@@ -337,7 +427,11 @@ public class Interfaz {
     
         return false;
     }
-
+    /**
+     * Verifica si el tablero está lleno.
+     * @param tableroActual Tablero actual del juego.
+     * @return True si el tablero está lleno, false en caso contrario.
+     */
     private static boolean tableroLleno(char[][] tableroActual){
         int contador = 0;
         for(int i = 0;i<tableroActual[0].length;i++){
@@ -346,7 +440,10 @@ public class Interfaz {
         if(contador==0) return true;
         return false;
     }
-
+    /**
+     * Imprime la ayuda del juego.
+     * @param args Argumentos de la línea de comandos.
+     */
     public void imprimirAyuda(String[] args){
         System.out.println("Bienvenido al juego de 4 en raya!");
         System.out.println("Cómo jugar:");
@@ -354,4 +451,5 @@ public class Interfaz {
         System.out.println("- Selecciona la opción 'Personalizado' para personalizar el juego con tus propias reglas.");
         System.out.println("- En el modo 'Personalizado', podrás especificar el tamaño del tablero, la ficha de cada jugador y el valor para ganar.");
     }
+
 }
