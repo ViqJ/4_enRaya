@@ -189,7 +189,7 @@ public class Interfaz {
      */
     private static boolean validarNombre(Jugador[] jugadores,String nombreJugador){
         for(int i = 0; i<jugadores.length;i++){
-            if(jugadores[i]!=null&&jugadores[i].getNombre()==nombreJugador) return false;
+            if(jugadores[i]!=null&&jugadores[i].getNombre().equals(nombreJugador)) return false;
         }
         return true;
     }
@@ -265,7 +265,7 @@ public class Interfaz {
             if(entrada.hasNextInt()){
                 valor = entrada.nextInt();
                 for(int i=0;i<valoresPosibles.length;i++){
-                    if(valor==valoresPosibles[i]){
+                    if(valoresPosibles[i]!=0&&valor==valoresPosibles[i]){
                         valorValido = true;
                         break;
                     }
