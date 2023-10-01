@@ -270,6 +270,7 @@ public class Interfaz {
                 if (fichaActual == tableroActual[i][j]) {
                     contador++;
                     if (contador == minWin) {
+                        System.out.println("gana horizontal en fila "+(i+1)+" y columna "+(j+1));
                         return true;
                     }
                 } else {
@@ -285,6 +286,7 @@ public class Interfaz {
                 if (fichaActual == tableroActual[i][j]) {
                     contador++;
                     if (contador == minWin) {
+                        System.out.println("gana vertica en fila "+(i+1)+" y columna "+(j+1));
                         return true;
                     }
                 } else {
@@ -293,14 +295,18 @@ public class Interfaz {
             }
         }
     
-        // revisar abajo izquierda
+        // revisar abajo derecha
         for (int i = 0; i < tableroActual.length; i++) {
             int contador = 0;
             for (int j = 0; j < tableroActual[i].length; j++) {
+                contador = 0;
                 for(int n = 0; i+n < tableroActual.length && j+n < tableroActual[i].length; n++) {
                     if(tableroActual[i+n][j+n] == fichaActual) {        
                         contador++;
-                        if(contador == minWin) return true;
+                        if(contador == minWin){
+                            System.out.println("gana diagonal abajo derecha en fila "+(i+1)+" y columna "+(j+1));
+                            return true;
+                        }
                     } else {
                         contador = 0;
                         break;
@@ -313,10 +319,14 @@ public class Interfaz {
         for (int i = 0; i < tableroActual.length; i++) {
             int contador = 0;
             for (int j = 0; j < tableroActual[i].length; j++) {
+                contador = 0;
                 for(int n = 0; i-n >= 0 && j+n < tableroActual[i].length; n++) {
                     if(tableroActual[i-n][j+n] == fichaActual) {
                         contador++;
-                        if(contador == minWin) return true;
+                        if(contador == minWin){
+                            System.out.println("gana diagonal arriba derecha en fila "+(i+1)+" y columna "+(j+1));
+                            return true;
+                        }
                     } else {
                         contador = 0;
                         break;
