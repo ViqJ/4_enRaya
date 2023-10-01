@@ -27,7 +27,7 @@ public class Interfaz {
     public void iniciarJuego(){
         // Inicia el juego
         iniciarTablero();
-        boolean terminarPartida = false;
+        boolean terminarPartida = false;//variable para terminar el juego
         while(true){
             //Ciclo de juego
             for(int i = 0;i<partida.getJugadores().length;i++){
@@ -49,11 +49,11 @@ public class Interfaz {
         //Cierre el scanner
         entrada.close();
     }
-    /*
+    /**
      * Inicia el tablero del juego.
-     * Solicita la configuración del juego al usuario.
-     * Crea una instancia de la clase Juego con la configuración del usuario.
-     */
+    * Solicita la configuración del juego al usuario.
+    * Crea una instancia de la clase Juego con la configuración del usuario.
+    */
     private static void iniciarTablero(){
         int cantidadJugadores;
         int tamañoMinTableroValido;
