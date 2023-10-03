@@ -158,6 +158,11 @@ public class Interfaz {
         String palabra;
         while(true){
             System.out.print(consulta);
+                if(entrada.hasNextInt()){
+                    System.out.println("Valor no valido");
+                    entrada.next();
+                    continue;
+                }
                 palabra = entrada.next();
                 break;
         }
@@ -172,6 +177,11 @@ public class Interfaz {
         String palabra;
         while(true){
             System.out.print(consulta);
+                if(entrada.hasNextInt()){
+                    System.out.println("Valor no valido");
+                    entrada.next();
+                    continue;
+                }
                 palabra = entrada.next();
                 if(palabra.length()==1&&palabra!="|"){
                 break;
