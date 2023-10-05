@@ -13,7 +13,6 @@ public class Interfaz {
 
     private static Scanner entrada = new Scanner(System.in);
     private static Juego partida;
-    private static int minWin = 4; //valor minimo para ganar por defecto
 
     /**
      * Constructor de la clase Interfaz.
@@ -42,7 +41,7 @@ public class Interfaz {
                     //Ciclo de jugadores
                     mostrarTablero(partida.getTablero());
                     //Ciclo de jugadas
-                    partida.setTablero(nuevoTablero(elegirJugada(partida.getTablero(),i),i,partida.getTablero()));
+                    partida.setTablero(i,obtenervalor(partida.getJugadores()[i].getNombre() +" tu ficha es: "+ partida.getJugadores()[i].getFicha() + " elige una columna valida: ", Juego.obtenerColumnasValidas(partida.getTablero())));
                     //Verificar si el jugador actual gana
                     if(!partidaSigue(partida.getTablero(),i)){
                         mostrarTablero(partida.getTablero());
@@ -68,6 +67,7 @@ public class Interfaz {
         int tamanoMinTableroValido;
         int tamanoFilas;
         int tamanoColumnas;
+        int minWin;
         Jugador[] jugadores;
         //Se valida tipo de juego personalizado o clasico
         boolean personalizado = obtenervalor("Digite modo 1.Personalizado 2.Clasico: ", new int[]{1, 2}) == 1;
@@ -90,25 +90,11 @@ public class Interfaz {
             jugadores = obtenerJugadores(cantidadJugadores);
         }
         //Se crea tablero
-        char [][] tablero = crearTablero(tamanoFilas,tamanoColumnas);
+        char [][] tablero = Juego.crearTablero(tamanoFilas,tamanoColumnas);
         //Se crea instancia de juego
-        partida = new Juego(tablero,jugadores);
+        partida = new Juego(tablero,jugadores,minWin);
     }
-    /**
-     * Crea un tablero vacio con el tamano especificado.
-     * @param filas Filas del tablero.
-     * @param columnas columnas del tablero.
-     * @return El tablero con caracteres en blanco.
-     */
-    private static char [][] crearTablero(int filas, int columnas){
-        char [][] tablero = new char [filas][columnas];
-        for(int i = 0; i < tablero.length;i++){
-            for(int j = 0;j < tablero[i].length;j++){
-                tablero [i][j] = ' ';
-            }
-        }
-        return tablero;
-    }
+
     /**
      * Obtiene un valor entero valido y mayor o igual a un minimo.
      * @param consulta  Consulta para el usuario.
@@ -145,13 +131,13 @@ public class Interfaz {
             char fichaJugador = ' ';
             while(nombreValido==false){
             nombreJugador = obtenerString("Digite nombre de jugador "+ (i+1) +" :");
-            nombreValido = validarNombre(jugadores,nombreJugador);
+            nombreValido = Juego.validarNombre(jugadores,nombreJugador);
             if(!nombreValido) System.out.println("Nombre ya existe");
             }
             jugadores[i] = new Jugador(nombreJugador);
             while(fichaValida==false){
             fichaJugador = obtenerChar("Digite ficha de jugador (caracter <> | ) para el jugador "+ jugadores[i].getNombre()+" :");
-            fichaValida = validarFicha(jugadores,fichaJugador);
+            fichaValida = Juego.validarFicha(jugadores,fichaJugador);
             if(!fichaValida) System.out.println("Ficha ya existe");
             }
             jugadores[i].setFicha(fichaJugador);
@@ -200,30 +186,8 @@ public class Interfaz {
         }
         return palabra.charAt(0);
     }
-    /**
-     * Valida nombre de jugador que no exista ya en la partida.
-     * @param jugadores Lista de jugadores de la partida.
-     * @param nombreJugador Nombre del jugador a validar.
-     * @return  True si el nombre es valido, false en caso contrario.
-     */
-    private static boolean validarNombre(Jugador[] jugadores,String nombreJugador){
-        for(int i = 0; i<jugadores.length;i++){
-            if(jugadores[i]!=null&&jugadores[i].getNombre().equals(nombreJugador)) return false;
-        }
-        return true;
-    }
-    /**
-     * Valida ficha de jugador que no exista ya en la partida.
-     * @param jugadores Lista de jugadores de la partida.
-     * @param fichaJugador Ficha del jugador a validar.
-     * @return True si la ficha es valida, false en caso contrario.
-     */
-    private static boolean validarFicha(Jugador[] jugadores,char fichaJugador){
-        for(int i = 0; i<jugadores.length;i++){
-            if(jugadores[i]!=null&&jugadores[i].getFicha()==fichaJugador) return false;
-        }
-        return true;
-    }
+
+
     /**
      * Imprime el tablero actual del juego.
      * @param tableroActual Tablero actual del juego.
@@ -259,17 +223,7 @@ public class Interfaz {
             System.out.println();//pasamos a siguiente linea al terminar la fila
         }
     }
-    /**
-     * Solicita al usuario la jugada que desea realizar.
-     * @param tableroActual Tablero actual del juego.
-     * @param indiceJugadorActual Indice del jugador actual en la lista de jugadores.
-     * @return La columna elegida por el usuario.
-     */
-    private static int elegirJugada(char[][] tableroActual,int indiceJugadorActual) {
-        int[] columnasPosibles = obtenerColumnasValidas(tableroActual);
-        int columnaElegida = obtenervalor(partida.getJugadores()[indiceJugadorActual].getNombre() +" tu ficha es: "+ partida.getJugadores()[indiceJugadorActual].getFicha() + " elige una columna valida: ", columnasPosibles);
-        return columnaElegida;
-    }
+
     /**
      * Obtiene un valor entero valido de una lista de valores posibles
      * @param consulta Consulta para el usuario.
@@ -298,55 +252,8 @@ public class Interfaz {
         }
         return valor;
     }
-    /**
-     * Obtiene las columnas validas para realizar una jugada.
-     * @param tableroActual Tablero actual del juego.
-     * @return La lista de columnas validas para realizar una jugada.
-     */
-    private static int [] obtenerColumnasValidas(char[][] tableroActual){
-        int[] columnasPosibles = new int[tableroActual[0].length];
-        int n = 0;
-        for (int i = 0; i < tableroActual[0].length; i++) {
-            int contador = 0;
-            for (int j = 0; j < tableroActual.length; j++) {
-                if (tableroActual[j][i] == ' ') {
-                    contador++;
-                }
-            }
-            if (contador > 0) {
-                columnasPosibles[n] = i + 1;
-                n++;
-            }
-        }
-        int[] columnasValidas = new int[n + 1];
-        int s = 0;
-        for (int i = 0; i < columnasPosibles.length; i++) {
-            if (columnasPosibles[i] != 0) {
-                columnasValidas[s] = columnasPosibles[i];
-                s++;
-            }
-        }
-        return columnasValidas;
-    }
-    /**
-     * Crea un nuevo tablero con la jugada realizada por el jugador actual.
-     * @param columnasElegida Columna elegida por el jugador actual.
-     * @param indiceJugadorActual Indice del jugador actual en la lista de jugadores.
-     * @param tableroActual  Tablero actual del juego.
-     * @return El tablero actualizado con la jugada realizada por el jugador actual.
-     */
-    private static char[][] nuevoTablero(int columnasElegida,int indiceJugadorActual,char [][] tableroActual){
 
 
-        for(int i = tableroActual.length-1;i>=0;i--){
-            if(tableroActual[i][columnasElegida-1]==' '){
-                tableroActual[i][columnasElegida-1] = partida.getJugadores()[indiceJugadorActual].getFicha();
-                break;
-            }
-        }
-
-        return tableroActual;
-    }
     /**
      * Verifica si el juego sigue.
      * @param tableroActual Tablero actual del juego.
@@ -354,111 +261,22 @@ public class Interfaz {
      * @return True si el juego sigue, false en caso contrario.
      */
     private static boolean partidaSigue(char[][] tableroActual,int indiceJugadorActual){
-        if(ganaJugador(tableroActual,indiceJugadorActual)){
+        if(Juego.ganaJugador(tableroActual,indiceJugadorActual,partida.getJugadores()[indiceJugadorActual].getFicha(),partida.getMinWin())){
             System.out.println("Felicidades "+ partida.getJugadores()[indiceJugadorActual].getNombre()+" has ganado");
             return false;
-        }else if(tableroLleno(tableroActual)){
+        }else if(Juego.tableroLleno(tableroActual)){
             System.out.println("Tablero lleno, nadie gana");
             return false;
         }
     return true;
     }
-    /**
-     * Verifica si el jugador actual gana.
-     * @param tableroActual Tablero actual del juego.
-     * @param indiceJugadorActual Indice del jugador actual en la lista de jugadores.
-     * @return True si el jugador actual gana, false en caso contrario.
-     */
-    private static boolean ganaJugador(char[][] tableroActual, int indiceJugadorActual) {
-        char fichaActual = partida.getJugadores()[indiceJugadorActual].getFicha();
-    
-        // revisar horizontal
-        for (int i = 0; i < tableroActual.length; i++) {
-            int contador = 0;
-            for (int j = 0; j < tableroActual[i].length; j++) {
-                if (fichaActual == tableroActual[i][j]) {
-                    contador++;
-                    if (contador == minWin) {
-                        System.out.println("gana horizontal en fila "+(i+1)+" y columna "+(j+1));
-                        return true;
-                    }
-                } else {
-                    contador = 0;
-                }
-            }
-        }
-    
-        // revisar vertical abajo
-        for (int j = 0; j < tableroActual[0].length; j++) {
-            int contador = 0;
-            for (int i = 0; i < tableroActual.length; i++) {
-                if (fichaActual == tableroActual[i][j]) {
-                    contador++;
-                    if (contador == minWin) {
-                        System.out.println("gana vertica en fila "+(i+1)+" y columna "+(j+1));
-                        return true;
-                    }
-                } else {
-                    contador = 0;
-                }
-            }
-        }
-    
-        // revisar abajo derecha
-        for (int i = 0; i < tableroActual.length; i++) {
-            int contador = 0;
-            for (int j = 0; j < tableroActual[i].length; j++) {
-                contador = 0;
-                for(int n = 0; i+n < tableroActual.length && j+n < tableroActual[i].length; n++) {
-                    if(tableroActual[i+n][j+n] == fichaActual) {        
-                        contador++;
-                        if(contador == minWin){
-                            System.out.println("gana diagonal abajo derecha en fila "+(i+1)+" y columna "+(j+1));
-                            return true;
-                        }
-                    } else {
-                        contador = 0;
-                        break;
-                    }
-                }
-            }
-        }
-    
-        // revisar arriba derecha
-        for (int i = 0; i < tableroActual.length; i++) {
-            int contador = 0;
-            for (int j = 0; j < tableroActual[i].length; j++) {
-                contador = 0;
-                for(int n = 0; i-n >= 0 && j+n < tableroActual[i].length; n++) {
-                    if(tableroActual[i-n][j+n] == fichaActual) {
-                        contador++;
-                        if(contador == minWin){
-                            System.out.println("gana diagonal arriba derecha en fila "+(i+1)+" y columna "+(j+1));
-                            return true;
-                        }
-                    } else {
-                        contador = 0;
-                        break;
-                    }
-                }
-            }
-        }
-    
-        return false;
-    }
+
     /**
      * Verifica si el tablero esta lleno.
      * @param tableroActual Tablero actual del juego.
      * @return True si el tablero esta lleno, false en caso contrario.
      */
-    private static boolean tableroLleno(char[][] tableroActual){
-        int contador = 0;
-        for(int i = 0;i<tableroActual[0].length;i++){
-            if(tableroActual[0][i]==' ') contador++;
-        }
-        if(contador==0) return true;
-        return false;
-    }
+
     /**
      * Imprime la ayuda del juego.
      * @param args Argumentos de la linea de comandos.
